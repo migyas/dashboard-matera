@@ -8,6 +8,8 @@ export const ContainerRegister = styled(Paper)`
   width: 100%;
   height: max-content;
   padding: 2.5rem;
+  max-height: 650px;
+  overflow: auto;
 
   header {
     margin: 2rem 0;
@@ -63,4 +65,12 @@ export const FormContainer = styled.form`
     font-weight: bold;
     gap: 0.5rem;
   }
+`;
+
+export const CustomInput = styled.input`
+  width: 100%;
+  padding: 1.75rem 0.75rem;
+  display: inline-block;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
 `;
