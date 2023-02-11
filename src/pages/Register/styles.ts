@@ -69,8 +69,12 @@ export const FormContainer = styled.form`
 
 export const CustomInput = styled.input`
   width: 100%;
-  padding: 1.75rem 0.75rem;
+  padding: 1.7rem 0.75rem;
   display: inline-block;
   border: 1px solid #bdbdbd;
   border-radius: 4px;
+
+  &.error {
+    border-color: #d32f2f;
+  }
 `;

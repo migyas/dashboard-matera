@@ -1,4 +1,4 @@
-import { createElement, useEffect, useState } from "react";
+import { createElement, useEffect, useState, useCallback } from "react";
 import { PersonAddAlt, LockOutlined, EmailOutlined, SearchOutlined } from "@mui/icons-material";
 import {
   Button,
@@ -9,30 +9,38 @@ import {
   MenuItem,
   Select,
   TextField,
+  FormHelperText,
 } from "@mui/material";
 import DatePicker from "react-datepicker";
-import { ContainerRegister, CustomInput, FormContainer, LinkRegister } from "./styles";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { addMonths } from "date-fns";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import { cpf } from "cpf-cnpj-validator";
-import { mask } from "@/utils/mask";
+import * as zod from "zod";
+import { mask, unMask } from "@/utils/mask";
+import { ContainerRegister, CustomInput, FormContainer, LinkRegister } from "./styles";
+import { optionGender } from "@/utils/mocks/gender";
+import { createUser } from "@/services/_v1/user-service";
+import { useNavigate } from "react-router-dom";
 
-interface RegisterFormData {
-  cep: string;
-  nome: string;
-  sobrenome: string;
-  cpf: string;
-  email: string;
-  senha: string;
-  sexo: string;
-  dt_nascimento: Date;
-  logradouro: string;
-  bairro: string;
-  cidade: string;
-  complemento?: string;
-  estado: string;
-}
+export const newUserFormValidationSchema = zod.object({
+  nome: zod.string().min(1, "Campo obrigatório"),
+  sobrenome: zod.string().min(1, "Campo obrigatório"),
+  email: zod.string().min(1, "Campo obrigatório").email(),
+  senha: zod.string().min(8, "Mínimo de 8 caracteres"),
+  cpf: zod.string().min(14, "Campo obrigatório"),
+  cep: zod.string().min(7, "Campo obrigatório"),
+  logradouro: zod.string(),
+  bairro: zod.string(),
+  cidade: zod.string(),
+  estado: zod.string(),
+  complemento: zod.string().min(2, "Campo obrigatório"),
+  dt_nascimento: zod.date(),
+  sexo: zod.string().min(1),
+});
+
+export type NewUserFormData = zod.infer<typeof newUserFormValidationSchema>;
 
 export function Register() {
   const [existsCep, setExistsCep] = useState(false);
@@ -43,18 +51,34 @@ export function Register() {
     reset,
     control,
     setError,
-    clearErrors,
+    setValue,
+    getValues,
     formState: { isSubmitting, errors },
-  } = useForm<RegisterFormData>({
+  } = useForm<NewUserFormData>({
     mode: "onBlur",
     reValidateMode: "onChange",
+    resolver: zodResolver(newUserFormValidationSchema),
+    defaultValues: {
+      sexo: optionGender[0].value,
+    },
   });
 
-  const [cepWatch, cpfWatch] = watch(["cep", "cpf"]);
+  const cepWatch = watch("cep");
+  const navigate = useNavigate();
 
-  async function onSubmit(data: any) {
-    // TODO - Formatar a data ao enviar
-    console.log(data);
+  async function onSubmit(user: NewUserFormData) {
+    try {
+      const isValidCPF = cpf.isValid(user.cpf);
+      if (isValidCPF) {
+        // await createUser({ ...user, cpf: unMask(user.cpf) });
+        navigate("/");
+        reset();
+      } else {
+        setError("cpf", { message: "CPF Inválido", type: "validate" });
+      }
+    } catch {
+      console.log("deu erro");
+    }
   }
 
   async function getCEPInformation() {
@@ -62,33 +86,33 @@ export function Register() {
     return data;
   }
 
-  useEffect(() => {
+  function fillFieldsInForm(formatedCEP: {
+    bairro: string;
+    logradouro: string;
+    cidade: string;
+    estado: string;
+  }) {
+    const getAllValues = getValues();
+    reset({ ...getAllValues, ...formatedCEP });
+  }
+
+  const getCEP = useCallback(async () => {
     if (cepWatch && cepWatch.length === 9) {
-      const cep = async () => {
-        const { localidade, uf, logradouro, bairro } = await getCEPInformation();
-        const formatedCEP = {
-          bairro,
-          logradouro,
-          cidade: localidade,
-          estado: uf,
-        };
-        setExistsCep(!!formatedCEP);
-        reset(formatedCEP);
+      const { localidade, uf, logradouro, bairro } = await getCEPInformation();
+      const formatedCEP = {
+        bairro,
+        logradouro,
+        cidade: localidade,
+        estado: uf,
       };
-      cep();
+      setExistsCep(!!formatedCEP);
+      fillFieldsInForm(formatedCEP);
     }
   }, [cepWatch]);
 
   useEffect(() => {
-    if (cpfWatch) {
-      const isValid = cpf.isValid(cpfWatch);
-      if (!isValid) {
-        setError("cpf", { message: "CPF Inválido" });
-      } else {
-        clearErrors("cpf");
-      }
-    }
-  }, [cpfWatch]);
+    getCEP();
+  }, [cepWatch]);
 
   return (
     <ContainerRegister>
@@ -100,10 +124,24 @@ export function Register() {
       <FormContainer onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2}>
           <Grid item xs={6}>
-            <TextField {...register("nome")} label="Nome" variant="outlined" />
+            <TextField
+              {...register("nome", {
+                required: "Campo Obrigatório",
+              })}
+              label="Nome"
+              variant="outlined"
+              error={!!errors.nome}
+              helperText={!!errors.nome && errors.nome?.message}
+            />
           </Grid>
           <Grid item xs={6}>
-            <TextField {...register("sobrenome")} label="Sobrenome" variant="outlined" />
+            <TextField
+              {...register("sobrenome")}
+              label="Sobrenome"
+              variant="outlined"
+              error={!!errors.sobrenome}
+              helperText={!!errors.sobrenome && errors.sobrenome?.message}
+            />
           </Grid>
         </Grid>
         <TextField
@@ -111,6 +149,9 @@ export function Register() {
           type="email"
           label="Email"
           variant="outlined"
+          autoComplete="current-email"
+          error={!!errors.email}
+          helperText={!!errors.email && errors.email?.message}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -125,6 +166,8 @@ export function Register() {
           label="Senha"
           variant="outlined"
           autoComplete="current-password"
+          error={!!errors.senha}
+          helperText={!!errors.senha && errors.senha?.message}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -133,69 +176,79 @@ export function Register() {
             ),
           }}
         />
-        <Controller
-          control={control}
-          name="cpf"
-          render={({ field: { onChange, value } }) => (
-            <TextField
-              onChange={(e) => {
-                onChange(mask(e.target.value, "999.999.999-99"));
-              }}
-              value={value}
-              label="CPF"
-              variant="outlined"
-              error={!!errors.cpf}
-              helperText={!!errors.cpf && errors.cpf?.message}
-            />
-          )}
-        />
-        {/* <TextField
+        <TextField
           {...register("cpf", {
-            onChange: ({ target }) =>
-              new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-                maximumFractionDigits: 2,
-              }).format(target.value),
-            valueAsNumber: true,
+            onChange: (e) => {
+              setValue("cpf", mask(e.target.value, "999.999.999-99"));
+            },
           })}
+          type="text"
           label="CPF"
           variant="outlined"
-        /> */}
-        <FormControl>
-          <InputLabel id="gender">Sexo</InputLabel>
-          <Select labelId="gender" label="Sexo" {...register("sexo")}>
-            <MenuItem value="sexo 1">Masculino</MenuItem>
-            <MenuItem value="sexo 2">Feminino</MenuItem>
-          </Select>
-        </FormControl>
-        <Grid style={{ zIndex: 9999 }}>
-          <Controller
-            name="dt_nascimento"
-            control={control}
-            render={({ field: { name, value, onChange } }) => (
-              <DatePicker
-                name={name}
-                selected={value}
-                locale="pt-BR"
-                dateFormat="dd/MM/yyyy"
-                showMonthDropdown
-                showYearDropdown
-                closeOnScroll
-                maxDate={addMonths(new Date(), 6)}
-                dropdownMode="select"
-                placeholderText="Data de nascimento"
-                customInput={createElement(CustomInput)}
-                onChange={onChange}
-                yearItemNumber={9}
+          error={!!errors.cpf}
+          helperText={!!errors.cpf && "CPF Inválido"}
+        />
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <FormControl fullWidth>
+              <InputLabel id="gender">Sexo</InputLabel>
+              <Controller
+                control={control}
+                name="sexo"
+                render={({ field }) => (
+                  <Select
+                    labelId="gender"
+                    {...field}
+                    variant="outlined"
+                    label="Sexo"
+                    placeholder="Sexo"
+                  >
+                    {optionGender.map((gender) => (
+                      <MenuItem key={gender.value} value={gender.value}>
+                        {gender.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
               />
-            )}
-          />
+            </FormControl>
+          </Grid>
+          <Grid item xs={6} style={{ zIndex: 99 }}>
+            <Controller
+              name="dt_nascimento"
+              control={control}
+              render={({ field: { name, value, onChange } }) => (
+                <DatePicker
+                  name={name}
+                  selected={value}
+                  locale="pt-BR"
+                  dateFormat="dd/MM/yyyy"
+                  showMonthDropdown
+                  showYearDropdown
+                  closeOnScroll
+                  maxDate={addMonths(new Date(), 6)}
+                  dropdownMode="select"
+                  placeholderText="Data de nascimento"
+                  customInput={createElement(CustomInput)}
+                  onChange={onChange}
+                  yearItemNumber={9}
+                  className={`${!!errors.dt_nascimento && "error"}`}
+                />
+              )}
+            />
+            <FormHelperText error>{!!errors.dt_nascimento && "Campo obrigatório"}</FormHelperText>
+          </Grid>
         </Grid>
         <TextField
-          {...register("cep")}
+          {...register("cep", {
+            onChange: (e) => {
+              setValue("cep", mask(e.target.value, "99999-999"));
+            },
+          })}
           label="CEP"
           variant="outlined"
+          error={!!errors.cep}
+          helperText={!!errors.cep && errors.cep?.message}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -258,7 +311,13 @@ export function Register() {
             />
           </Grid>
         </Grid>
-        <TextField disabled={!existsCep} label="Complemento" variant="outlined" />
+        <TextField
+          {...register("complemento")}
+          label="Complemento"
+          error={!!errors.complemento}
+          helperText={!!errors.complemento && errors.complemento?.message}
+          variant="outlined"
+        />
         <Button type="submit" variant="contained" disabled={isSubmitting}>
           Registrar
         </Button>
