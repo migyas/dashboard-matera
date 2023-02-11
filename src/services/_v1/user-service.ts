@@ -6,9 +6,16 @@ async function getAllUsers() {
   return data;
 }
 
+async function searchForUsers(params: { senha: string; email: string }) {
+  const { data } = await api.get("/user", {
+    params,
+  });
+  return data;
+}
+
 async function createUser(user: NewUserFormData) {
   const { data } = await api.post("/user", user);
   return data;
 }
 
-export { getAllUsers, createUser };
+export { getAllUsers, createUser, searchForUsers };
