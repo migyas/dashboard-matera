@@ -45,7 +45,6 @@ export function Login() {
         />
         <Button type="submit" variant="contained">
           Entrar
-          <LoginOutlined />
         </Button>
       </FormContainer>
       <span>

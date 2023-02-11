@@ -61,6 +61,5 @@ export const FormContainer = styled.form`
     padding: 0.75rem;
     font-size: 1rem;
     font-weight: bold;
-    gap: 0.5rem;
   }
 `;
