@@ -1,12 +1,15 @@
+import { Sidebar } from "@/components/Sidebar";
 import { Outlet } from "react-router-dom";
-import { Container } from "./styles";
+import { Container, MainContent } from "./styles";
 
 export function PrivateLayout() {
   return (
     <Container>
-      <main>
+      <Sidebar />
+      <MainContent>
+        {/* <Profile /> */}
         <Outlet />
-      </main>
+      </MainContent>
     </Container>
   );
 }

@@ -3,12 +3,19 @@ import styled from "styled-components";
 export const Container = styled.div`
   display: flex;
   height: 100vh;
-  /* justify-content: center;
-  align-items: center; */
+  background: ${(props) => props.theme["white"]};
+`;
 
-  main {
-    width: 100%;
-    max-width: 28rem;
-    margin: 0 0.5rem;
+export const MainContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-width: 70rem;
+  width: 100%;
+  height: 100vh;
+
+  h1 {
+    color: ${(props) => props.theme["gray-400"]};
+    font-size: 1.75rem;
   }
 `;
