@@ -1,12 +1,10 @@
-import { Outlet } from "react-router-dom";
+import { PropsWithChildren } from "react";
 import { Container } from "./styles";
 
-export function PublicLayout() {
+export function PublicLayout({ children }: PropsWithChildren) {
   return (
     <Container>
-      <main>
-        <Outlet />
-      </main>
+      <main>{children}</main>
     </Container>
   );
 }

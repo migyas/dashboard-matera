@@ -23,6 +23,7 @@ import { ContainerRegister, CustomInput, FormContainer, LinkRegister } from "./s
 import { optionGender } from "@/utils/mocks/gender";
 import { createUser } from "@/services/_v1/user-service";
 import { useNavigate } from "react-router-dom";
+import { PublicLayout } from "@/layouts/PublicLayout";
 
 export const newUserFormValidationSchema = zod.object({
   nome: zod.string().min(1, "Campo obrigatório"),
@@ -42,7 +43,7 @@ export const newUserFormValidationSchema = zod.object({
 
 export type NewUserFormData = zod.infer<typeof newUserFormValidationSchema>;
 
-export function Register() {
+export default function Register() {
   const [existsCep, setExistsCep] = useState(false);
   const {
     register,
@@ -115,216 +116,218 @@ export function Register() {
   }, [cepWatch]);
 
   return (
-    <ContainerRegister>
-      <header>
-        <PersonAddAlt />
-        <strong>Registre-se</strong>
-        <span>Informe seus dados</span>
-      </header>
-      <FormContainer onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <TextField
-              {...register("nome", {
-                required: "Campo Obrigatório",
-              })}
-              label="Nome"
-              variant="outlined"
-              error={!!errors.nome}
-              helperText={!!errors.nome && errors.nome?.message}
-            />
+    <PublicLayout>
+      <ContainerRegister>
+        <header>
+          <PersonAddAlt />
+          <strong>Registre-se</strong>
+          <span>Informe seus dados</span>
+        </header>
+        <FormContainer onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <TextField
+                {...register("nome", {
+                  required: "Campo Obrigatório",
+                })}
+                label="Nome"
+                variant="outlined"
+                error={!!errors.nome}
+                helperText={!!errors.nome && errors.nome?.message}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                {...register("sobrenome")}
+                label="Sobrenome"
+                variant="outlined"
+                error={!!errors.sobrenome}
+                helperText={!!errors.sobrenome && errors.sobrenome?.message}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <TextField
-              {...register("sobrenome")}
-              label="Sobrenome"
-              variant="outlined"
-              error={!!errors.sobrenome}
-              helperText={!!errors.sobrenome && errors.sobrenome?.message}
-            />
-          </Grid>
-        </Grid>
-        <TextField
-          {...register("email")}
-          type="email"
-          label="Email"
-          variant="outlined"
-          autoComplete="current-email"
-          error={!!errors.email}
-          helperText={!!errors.email && errors.email?.message}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <EmailOutlined />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <TextField
-          {...register("senha")}
-          type="password"
-          label="Senha"
-          variant="outlined"
-          autoComplete="current-password"
-          error={!!errors.senha}
-          helperText={!!errors.senha && errors.senha?.message}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <LockOutlined />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <TextField
-          {...register("cpf", {
-            onChange: (e) => {
-              setValue("cpf", mask(e.target.value, "999.999.999-99"));
-            },
-          })}
-          type="text"
-          label="CPF"
-          variant="outlined"
-          error={!!errors.cpf}
-          helperText={!!errors.cpf && "CPF Inválido"}
-        />
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <FormControl fullWidth>
-              <InputLabel id="gender">Sexo</InputLabel>
+          <TextField
+            {...register("email")}
+            type="email"
+            label="Email"
+            variant="outlined"
+            autoComplete="current-email"
+            error={!!errors.email}
+            helperText={!!errors.email && errors.email?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <EmailOutlined />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            {...register("senha")}
+            type="password"
+            label="Senha"
+            variant="outlined"
+            autoComplete="current-password"
+            error={!!errors.senha}
+            helperText={!!errors.senha && errors.senha?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <LockOutlined />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            {...register("cpf", {
+              onChange: (e) => {
+                setValue("cpf", mask(e.target.value, "999.999.999-99"));
+              },
+            })}
+            type="text"
+            label="CPF"
+            variant="outlined"
+            error={!!errors.cpf}
+            helperText={!!errors.cpf && "CPF Inválido"}
+          />
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <InputLabel id="gender">Sexo</InputLabel>
+                <Controller
+                  control={control}
+                  name="sexo"
+                  render={({ field }) => (
+                    <Select
+                      labelId="gender"
+                      {...field}
+                      variant="outlined"
+                      label="Sexo"
+                      placeholder="Sexo"
+                    >
+                      {optionGender.map((gender) => (
+                        <MenuItem key={gender.value} value={gender.value}>
+                          {gender.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={6} style={{ zIndex: 99 }}>
               <Controller
+                name="dt_nascimento"
                 control={control}
-                name="sexo"
-                render={({ field }) => (
-                  <Select
-                    labelId="gender"
-                    {...field}
-                    variant="outlined"
-                    label="Sexo"
-                    placeholder="Sexo"
-                  >
-                    {optionGender.map((gender) => (
-                      <MenuItem key={gender.value} value={gender.value}>
-                        {gender.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                render={({ field: { name, value, onChange } }) => (
+                  <DatePicker
+                    name={name}
+                    selected={value}
+                    locale="pt-BR"
+                    dateFormat="dd/MM/yyyy"
+                    showMonthDropdown
+                    showYearDropdown
+                    closeOnScroll
+                    maxDate={addMonths(new Date(), 6)}
+                    dropdownMode="select"
+                    placeholderText="Data de nascimento"
+                    customInput={createElement(CustomInput)}
+                    onChange={onChange}
+                    yearItemNumber={9}
+                    className={`${!!errors.dt_nascimento && "error"}`}
+                  />
                 )}
               />
-            </FormControl>
+              <FormHelperText error>{!!errors.dt_nascimento && "Campo obrigatório"}</FormHelperText>
+            </Grid>
           </Grid>
-          <Grid item xs={6} style={{ zIndex: 99 }}>
-            <Controller
-              name="dt_nascimento"
-              control={control}
-              render={({ field: { name, value, onChange } }) => (
-                <DatePicker
-                  name={name}
-                  selected={value}
-                  locale="pt-BR"
-                  dateFormat="dd/MM/yyyy"
-                  showMonthDropdown
-                  showYearDropdown
-                  closeOnScroll
-                  maxDate={addMonths(new Date(), 6)}
-                  dropdownMode="select"
-                  placeholderText="Data de nascimento"
-                  customInput={createElement(CustomInput)}
-                  onChange={onChange}
-                  yearItemNumber={9}
-                  className={`${!!errors.dt_nascimento && "error"}`}
-                />
-              )}
-            />
-            <FormHelperText error>{!!errors.dt_nascimento && "Campo obrigatório"}</FormHelperText>
+          <TextField
+            {...register("cep", {
+              onChange: (e) => {
+                setValue("cep", mask(e.target.value, "99999-999"));
+              },
+            })}
+            label="CEP"
+            variant="outlined"
+            error={!!errors.cep}
+            helperText={!!errors.cep && errors.cep?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchOutlined />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            disabled={!existsCep}
+            {...register("logradouro")}
+            label="Logradouro"
+            variant="outlined"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+          <TextField
+            disabled={!existsCep}
+            {...register("bairro")}
+            label="Bairro"
+            variant="outlined"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+          <Grid container spacing={2}>
+            <Grid item xs={7}>
+              <TextField
+                disabled={!existsCep}
+                {...register("cidade")}
+                label="Cidade"
+                variant="outlined"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Grid>
+            <Grid item xs={5}>
+              <TextField
+                disabled={!existsCep}
+                {...register("estado")}
+                label="UF"
+                variant="outlined"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Grid>
           </Grid>
-        </Grid>
-        <TextField
-          {...register("cep", {
-            onChange: (e) => {
-              setValue("cep", mask(e.target.value, "99999-999"));
-            },
-          })}
-          label="CEP"
-          variant="outlined"
-          error={!!errors.cep}
-          helperText={!!errors.cep && errors.cep?.message}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <SearchOutlined />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <TextField
-          disabled={!existsCep}
-          {...register("logradouro")}
-          label="Logradouro"
-          variant="outlined"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-        <TextField
-          disabled={!existsCep}
-          {...register("bairro")}
-          label="Bairro"
-          variant="outlined"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-        <Grid container spacing={2}>
-          <Grid item xs={7}>
-            <TextField
-              disabled={!existsCep}
-              {...register("cidade")}
-              label="Cidade"
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={5}>
-            <TextField
-              disabled={!existsCep}
-              {...register("estado")}
-              label="UF"
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-          </Grid>
-        </Grid>
-        <TextField
-          {...register("complemento")}
-          label="Complemento"
-          error={!!errors.complemento}
-          helperText={!!errors.complemento && errors.complemento?.message}
-          variant="outlined"
-        />
-        <Button type="submit" variant="contained" disabled={isSubmitting}>
-          Registrar
-        </Button>
-      </FormContainer>
-      <span>
-        Já possui uma conta? <LinkRegister to="/">Entrar</LinkRegister>
-      </span>
-    </ContainerRegister>
+          <TextField
+            {...register("complemento")}
+            label="Complemento"
+            error={!!errors.complemento}
+            helperText={!!errors.complemento && errors.complemento?.message}
+            variant="outlined"
+          />
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
+            Registrar
+          </Button>
+        </FormContainer>
+        <span>
+          Já possui uma conta? <LinkRegister to="/">Entrar</LinkRegister>
+        </span>
+      </ContainerRegister>
+    </PublicLayout>
   );
 }

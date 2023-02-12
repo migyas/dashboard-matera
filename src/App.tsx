@@ -7,15 +7,18 @@ import { defaultTheme } from "./styles/themes/default";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import { ptBR } from "date-fns/locale";
+import { AuthProvider } from "./contexts/authContext";
 
 registerLocale("pt-BR", ptBR);
 
 export function App() {
   return (
     <ThemeProvider theme={defaultTheme}>
-      <BrowserRouter>
-        <Routes />
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes />
+        </BrowserRouter>
+      </AuthProvider>
       <GlobalStyles />
     </ThemeProvider>
   );
