@@ -12,7 +12,8 @@ export const MainContent = styled.div`
   overflow: hidden;
   max-width: 70rem;
   width: 100%;
-  height: 100vh;
+  height: 100%;
+  padding: 2.5rem 1.25rem 1rem;
 
   h1 {
     color: ${(props) => props.theme["gray-600"]};

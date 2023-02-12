@@ -1,5 +1,4 @@
 import { AuthContext } from "@/contexts/authContext";
-import { Card } from "@mui/material";
 import { useContext } from "react";
 import { Container, WelcomeCard } from "./styles";
 
