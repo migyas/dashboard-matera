@@ -14,8 +14,6 @@ export function Sidebar() {
 
   const handleOpen = () => setOpen(!open);
 
-  console.log(open);
-
   return (
     <>
       <SidebarContainer open={open}>
