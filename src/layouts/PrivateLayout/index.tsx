@@ -7,7 +7,6 @@ export function PrivateLayout() {
     <Container>
       <Sidebar />
       <MainContent>
-        {/* <Profile /> */}
         <Outlet />
       </MainContent>
     </Container>

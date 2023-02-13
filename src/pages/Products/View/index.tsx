@@ -20,12 +20,10 @@ export default function ViewProduct() {
 
   useEffect(() => {
     (async () => {
-      try {
-        if (id) {
-          const data = await getProductById(id);
-          setProduct(data);
-        }
-      } catch {
+      if (id) {
+        const data = await getProductById(id);
+        setProduct(data);
+      } else {
         navigate("/products");
       }
     })();

@@ -71,20 +71,24 @@ export default function Register() {
     try {
       const isValidCPF = cpf.isValid(user.cpf);
       if (isValidCPF) {
-        // await createUser({ ...user, cpf: unMask(user.cpf) });
+        await createUser({ ...user, cpf: unMask(user.cpf) });
         navigate("/");
         reset();
       } else {
         setError("cpf", { message: "CPF Inválido", type: "validate" });
       }
     } catch {
-      console.log("deu erro");
+      console.log("Erro na API");
     }
   }
 
   async function getCEPInformation() {
-    const { data } = await axios.get(`https://viacep.com.br/ws/${cepWatch}/json`);
-    return data;
+    try {
+      const { data } = await axios.get(`https://viacep.com.br/ws/${cepWatch}/json`);
+      return data;
+    } catch {
+      setError("cep", { message: "Informar um CEP válido" });
+    }
   }
 
   function fillFieldsInForm(formatedCEP: {

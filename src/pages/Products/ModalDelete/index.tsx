@@ -1,6 +1,5 @@
 import { deleteProductById } from "@/services/_v1/product-service";
 import { Button, Fade, Grid, Modal } from "@mui/material";
-import { Box } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 import { ModalContent } from "../styles";
 
