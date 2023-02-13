@@ -7,8 +7,8 @@ interface PaginationQueryParamsProps {
   search?: string;
 }
 
-interface CreateProductData extends NewProductFormData {
-  avatar: FormData;
+interface CreateOrEditProductData extends NewProductFormData {
+  avatar?: FormData | string;
 }
 
 async function getAllProducts(params?: PaginationQueryParamsProps) {
@@ -21,9 +21,14 @@ async function getProductById(id: string) {
   return data;
 }
 
-async function createProduct(product: CreateProductData) {
+async function createProduct(product: CreateOrEditProductData) {
   const { data } = await api.post("/produto", product);
   return data;
 }
 
-export { getAllProducts, createProduct, getProductById };
+async function updateProduct(product: CreateOrEditProductData) {
+  const { data } = await api.put("/produto", product);
+  return data;
+}
+
+export { getAllProducts, createProduct, getProductById, updateProduct };

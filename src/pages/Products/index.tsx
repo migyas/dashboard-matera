@@ -15,6 +15,7 @@ export interface ProductData {
   nome: string;
   marca: string;
   preco: string;
+  avatar?: string;
   qt_estoque: number;
   qt_vendas: number;
   createdAt: Date;
@@ -30,7 +31,7 @@ export default function Products() {
   const [page, setPage] = useState(1);
   const [countPage, setCountPage] = useState(0);
   const navigate = useNavigate();
-  const { toggle: toggleModalAdd, isOpen: isOpenModalAdd } = useDisclosure();
+  const { toggle, isOpen } = useDisclosure();
   const { register, handleSubmit, reset, setValue } = useForm<SearchQueryFormProps>();
 
   async function onSubmit({ query }: SearchQueryFormProps) {
@@ -68,7 +69,7 @@ export default function Products() {
       <header>
         <h1>Produtos</h1>
         <div>
-          <Button variant="contained" color="success" onClick={toggleModalAdd}>
+          <Button variant="contained" color="success" onClick={toggle}>
             Adicionar produto
           </Button>
         </div>
@@ -139,7 +140,7 @@ export default function Products() {
         </table>
       </ProductList>
       <Pagination count={countPage} page={page} onChange={handleChange} />
-      <ModalAdd open={isOpenModalAdd} toggle={toggleModalAdd} />
+      <ModalAdd open={isOpen} toggle={toggle} />
     </Container>
   );
 }

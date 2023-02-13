@@ -7,9 +7,13 @@ import { ProductData } from "..";
 import { dateFormatter, priceFormatter } from "@/utils/formatter";
 import { ButtonContainer, Container, DescriptionProduct } from "./styles";
 import { Button } from "@mui/material";
+import useDisclosure from "@/hooks/useDisclosure";
+import { ModalEdit } from "../ModalEdit";
 
 export default function ViewProduct() {
   const [product, setProduct] = useState({} as ProductData);
+  const { toggle: toggleModalEdit, isOpen: isOpenModalEdit } = useDisclosure();
+  const { toggle: toggleModalDelete, isOpen: isOpenModalDelete } = useDisclosure();
   const { id } = useParams();
 
   useEffect(() => {
@@ -26,10 +30,10 @@ export default function ViewProduct() {
       <header>
         <h1>Visualização do produto</h1>
         <ButtonContainer>
-          <Button variant="contained" color="info">
+          <Button variant="contained" color="info" onClick={toggleModalEdit}>
             Editar
           </Button>
-          <Button variant="contained" color="error">
+          <Button variant="contained" color="error" onClick={toggleModalDelete}>
             Excluir
           </Button>
         </ButtonContainer>
@@ -58,6 +62,7 @@ export default function ViewProduct() {
           </li>
         </ul>
       </DescriptionProduct>
+      <ModalEdit open={isOpenModalEdit} toggle={toggleModalEdit} product={product} />
     </Container>
   );
 }

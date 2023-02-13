@@ -1,12 +1,13 @@
-import { createProduct } from "@/services/_v1/product-service";
+import { updateProduct } from "@/services/_v1/product-service";
 import { maskCurrency } from "@/utils/mask";
-import { Button, Fade, FormHelperText, Grid, Modal, TextField } from "@mui/material";
+import { Button, Fade, Grid, Modal, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { ProductData } from "..";
 
-export const newProductFormValidationSchema = zod.object({
+export const updateProductFormValidationSchema = zod.object({
   nome: zod.string().min(3, "Campo obrigatório"),
   marca: zod.string().min(3, "Campo obrigatório"),
   preco: zod.string().min(1, "Campo obrigatório"),
@@ -14,25 +15,25 @@ export const newProductFormValidationSchema = zod.object({
   qt_vendas: zod.number().min(1, "Campo obrigatório"),
 });
 
-export type NewProductFormData = zod.infer<typeof newProductFormValidationSchema>;
+export type UpdateProductFormData = zod.infer<typeof updateProductFormValidationSchema>;
 
-interface ModalAddProps {
+interface ModalEditProps {
   open: boolean;
   toggle: () => void;
+  product: ProductData;
 }
 
-export function ModalAdd({ toggle, open }: ModalAddProps) {
+export function ModalEdit({ toggle, open, product }: ModalEditProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [messageErrorFile, setMessageErrorFile] = useState("");
   const {
     register,
     handleSubmit,
     setValue,
     reset,
     formState: { isSubmitting, errors },
-  } = useForm<NewProductFormData>({
+  } = useForm<UpdateProductFormData>({
     mode: "onBlur",
-    resolver: zodResolver(newProductFormValidationSchema),
+    resolver: zodResolver(updateProductFormValidationSchema),
   });
 
   function handleSelectedFile(e: ChangeEvent<HTMLInputElement>) {
@@ -42,15 +43,18 @@ export function ModalAdd({ toggle, open }: ModalAddProps) {
     }
   }
 
-  async function onSubmit(newProduct: NewProductFormData) {
+  async function onSubmit(newProduct: UpdateProductFormData) {
     try {
       const data = new FormData();
       if (selectedFile) {
         data.append("file", selectedFile, selectedFile.name);
-        await createProduct({ ...newProduct, avatar: data });
+        await updateProduct({ ...newProduct, avatar: data });
         toggle();
       } else {
-        setMessageErrorFile("Selecione um arquivo de imagem");
+        if (product) {
+          await updateProduct({ ...newProduct, avatar: product.avatar });
+          toggle();
+        }
       }
     } catch {
       console.log("Erro na API");
@@ -61,6 +65,12 @@ export function ModalAdd({ toggle, open }: ModalAddProps) {
     toggle();
     reset();
   }
+
+  useEffect(() => {
+    if (product) {
+      reset({ ...product, preco: product.preco && maskCurrency(product.preco) });
+    }
+  }, [product]);
 
   return (
     <Modal
@@ -84,7 +94,7 @@ export function ModalAdd({ toggle, open }: ModalAddProps) {
           }}
         >
           <header>
-            <strong style={{ color: "#222" }}>Cadastrar novo produto</strong>
+            <strong style={{ color: "#222" }}>Editar produto</strong>
           </header>
           <TextField
             {...register("nome")}
@@ -141,11 +151,7 @@ export function ModalAdd({ toggle, open }: ModalAddProps) {
             Enviar Avatar
             <input type="file" hidden accept="image/*" onChange={handleSelectedFile} />
           </Button>
-          {selectedFile ? (
-            <strong style={{ color: "#222" }}>{selectedFile.name}</strong>
-          ) : (
-            <FormHelperText error>{messageErrorFile}</FormHelperText>
-          )}
+          {selectedFile && <strong style={{ color: "#222" }}>{selectedFile.name}</strong>}
           <Grid container spacing={3} mt={4}>
             <Grid item>
               <Button color="error" variant="outlined" onClick={handleClose}>
@@ -154,7 +160,7 @@ export function ModalAdd({ toggle, open }: ModalAddProps) {
             </Grid>
             <Grid item>
               <Button color="success" variant="contained" type="submit" disabled={isSubmitting}>
-                Adicionar
+                Salvar alterações
               </Button>
             </Grid>
           </Grid>
