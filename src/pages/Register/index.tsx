@@ -78,7 +78,7 @@ export default function Register() {
         toast({
           data: {
             color: "success",
-            message: "<strong>Produto</strong> criado com sucesso",
+            message: "<strong>Usuário</strong> criado com sucesso",
           },
         });
         reset();
