@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getProductById } from "@/services/_v1/product-service";
 import defaultImageProduct from "@/assets/caixa.png";
 
@@ -9,18 +9,24 @@ import { ButtonContainer, Container, DescriptionProduct } from "./styles";
 import { Button } from "@mui/material";
 import useDisclosure from "@/hooks/useDisclosure";
 import { ModalEdit } from "../ModalEdit";
+import { ModalDelete } from "../ModalDelete";
 
 export default function ViewProduct() {
   const [product, setProduct] = useState({} as ProductData);
   const { toggle: toggleModalEdit, isOpen: isOpenModalEdit } = useDisclosure();
   const { toggle: toggleModalDelete, isOpen: isOpenModalDelete } = useDisclosure();
+  const navigate = useNavigate();
   const { id } = useParams();
 
   useEffect(() => {
     (async () => {
-      if (id) {
-        const data = await getProductById(id);
-        setProduct(data);
+      try {
+        if (id) {
+          const data = await getProductById(id);
+          setProduct(data);
+        }
+      } catch {
+        navigate("/products");
       }
     })();
   }, []);
@@ -61,8 +67,16 @@ export default function ViewProduct() {
             {product.createdAt && dateFormatter.format(new Date(product?.createdAt))}
           </li>
         </ul>
+        <Button
+          variant="contained"
+          onClick={() => navigate("/products")}
+          style={{ marginTop: "2rem" }}
+        >
+          Voltar
+        </Button>
       </DescriptionProduct>
       <ModalEdit open={isOpenModalEdit} toggle={toggleModalEdit} product={product} />
+      <ModalDelete open={isOpenModalDelete} toggle={toggleModalDelete} id={product.id} />
     </Container>
   );
 }

@@ -31,4 +31,9 @@ async function updateProduct(product: CreateOrEditProductData) {
   return data;
 }
 
-export { getAllProducts, createProduct, getProductById, updateProduct };
+async function deleteProductById(id: string) {
+  const { data } = await api.delete(`/produto/${id}`);
+  return data;
+}
+
+export { getAllProducts, createProduct, getProductById, updateProduct, deleteProductById };

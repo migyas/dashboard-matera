@@ -16,7 +16,7 @@ export const ButtonContainer = styled.div`
 
 export const DescriptionProduct = styled.div`
   width: 100%;
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 0;
 
   img {
     width: 5rem;

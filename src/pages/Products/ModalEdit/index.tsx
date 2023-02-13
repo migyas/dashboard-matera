@@ -6,6 +6,7 @@ import * as zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, useEffect, useState } from "react";
 import { ProductData } from "..";
+import { ModalContent } from "../styles";
 
 export const updateProductFormValidationSchema = zod.object({
   nome: zod.string().min(3, "Campo obrigatório"),
@@ -51,10 +52,8 @@ export function ModalEdit({ toggle, open, product }: ModalEditProps) {
         await updateProduct({ ...newProduct, avatar: data });
         toggle();
       } else {
-        if (product) {
-          await updateProduct({ ...newProduct, avatar: product.avatar });
-          toggle();
-        }
+        await updateProduct({ ...newProduct, avatar: product.avatar });
+        toggle();
       }
     } catch {
       console.log("Erro na API");
@@ -81,90 +80,82 @@ export function ModalEdit({ toggle, open, product }: ModalEditProps) {
       closeAfterTransition
     >
       <Fade in={open}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          style={{
-            background: "#ffffff",
-            height: "100%",
-            width: "30%",
-            padding: "2rem",
-            display: "flex",
-            gap: "1.5rem",
-            flexDirection: "column",
-          }}
-        >
-          <header>
-            <strong style={{ color: "#222" }}>Editar produto</strong>
-          </header>
-          <TextField
-            {...register("nome")}
-            label="Nome"
-            fullWidth
-            error={!!errors.nome}
-            helperText={!!errors.nome && errors.nome?.message}
-          />
-          <TextField
-            {...register("marca")}
-            label="Marca"
-            fullWidth
-            error={!!errors.marca}
-            helperText={!!errors.marca && errors.marca?.message}
-          />
+        <ModalContent>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <header>
+              <strong>Editar produto</strong>
+            </header>
+            <TextField
+              {...register("nome")}
+              label="Nome"
+              fullWidth
+              error={!!errors.nome}
+              helperText={!!errors.nome && errors.nome?.message}
+            />
+            <TextField
+              {...register("marca")}
+              label="Marca"
+              fullWidth
+              error={!!errors.marca}
+              helperText={!!errors.marca && errors.marca?.message}
+            />
 
-          <TextField
-            {...register("preco", {
-              onChange: (e) => setValue("preco", maskCurrency(e.target.value)),
-            })}
-            fullWidth
-            placeholder="R$ 00,00"
-            error={!!errors.preco}
-            helperText={!!errors.preco && errors.preco?.message}
-          />
+            <TextField
+              {...register("preco", {
+                onChange: (e) => setValue("preco", maskCurrency(e.target.value)),
+              })}
+              fullWidth
+              placeholder="R$ 00,00"
+              error={!!errors.preco}
+              helperText={!!errors.preco && errors.preco?.message}
+              label="Preço"
+            />
 
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                {...register("qt_estoque", {
-                  valueAsNumber: true,
-                })}
-                fullWidth
-                type="number"
-                label="Qtd Estoque"
-                error={!!errors.qt_estoque}
-                helperText={!!errors.qt_estoque && errors.qt_estoque?.message}
-              />
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  {...register("qt_estoque", {
+                    valueAsNumber: true,
+                  })}
+                  fullWidth
+                  type="number"
+                  label="Qtd Estoque"
+                  error={!!errors.qt_estoque}
+                  helperText={!!errors.qt_estoque && errors.qt_estoque?.message}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  {...register("qt_vendas", {
+                    valueAsNumber: true,
+                  })}
+                  fullWidth
+                  type="number"
+                  label="Qtd Vendas"
+                  error={!!errors.qt_vendas}
+                  helperText={!!errors.qt_vendas && errors.qt_vendas?.message}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <TextField
-                {...register("qt_vendas", {
-                  valueAsNumber: true,
-                })}
-                fullWidth
-                type="number"
-                label="Qtd Vendas"
-                error={!!errors.qt_vendas}
-                helperText={!!errors.qt_vendas && errors.qt_vendas?.message}
-              />
+            <Button variant="contained" component="label">
+              Enviar Avatar
+              <input type="file" hidden accept="image/*" onChange={handleSelectedFile} />
+            </Button>
+            {selectedFile && <strong style={{ color: "#222" }}>{selectedFile.name}</strong>}
+            <Grid container spacing={3} mt={4}>
+              <Grid item>
+                <Button color="error" variant="outlined" onClick={handleClose}>
+                  Cancelar
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button color="success" variant="contained" type="submit" disabled={isSubmitting}>
+                  Salvar alterações
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-          <Button variant="contained" component="label">
-            Enviar Avatar
-            <input type="file" hidden accept="image/*" onChange={handleSelectedFile} />
-          </Button>
-          {selectedFile && <strong style={{ color: "#222" }}>{selectedFile.name}</strong>}
-          <Grid container spacing={3} mt={4}>
-            <Grid item>
-              <Button color="error" variant="outlined" onClick={handleClose}>
-                Cancelar
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button color="success" variant="contained" type="submit" disabled={isSubmitting}>
-                Salvar alterações
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
+          </form>
+        </ModalContent>
       </Fade>
     </Modal>
   );

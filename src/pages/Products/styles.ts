@@ -15,6 +15,31 @@ export const Container = styled.div`
   }
 `;
 
+export const ModalContent = styled.div`
+  background: #fff;
+  padding: 1.5rem 2.5rem;
+  border-radius: 5px;
+  width: max-content;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  header {
+    margin-bottom: 1.5rem;
+
+    strong {
+      color: ${(props) => props.theme["gray-600"]};
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+`;
+
 export const ProductList = styled.div`
   display: block;
   white-space: nowrap;
