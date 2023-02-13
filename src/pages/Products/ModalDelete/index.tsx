@@ -1,3 +1,4 @@
+import useCustomToast from "@/hooks/useCustomToast";
 import { deleteProductById } from "@/services/_v1/product-service";
 import { Button, Fade, Grid, Modal } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -11,13 +12,26 @@ interface ModaDeleteProps {
 
 export function ModalDelete({ toggle, open, id }: ModaDeleteProps) {
   const navigate = useNavigate();
+  const toast = useCustomToast();
 
   async function handleDeleteProduct() {
     try {
       await deleteProductById(id);
+      toast({
+        data: {
+          color: "success",
+          message: "<strong>Produto</strong> deletado com sucesso",
+        },
+      });
       navigate("/products");
     } catch {
-      console.log("Erro na API");
+      toast({
+        data: {
+          color: "error",
+          message: "Servidor fora do ar",
+        },
+      });
+      throw new Error("Servidor fora do ar");
     }
   }
 

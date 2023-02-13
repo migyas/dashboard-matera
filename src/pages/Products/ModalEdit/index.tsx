@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, useEffect, useState } from "react";
 import { ProductData } from "..";
 import { ModalContent } from "../styles";
+import useCustomToast from "@/hooks/useCustomToast";
 
 export const updateProductFormValidationSchema = zod.object({
   nome: zod.string().min(3, "Campo obrigatório"),
@@ -25,6 +26,7 @@ interface ModalEditProps {
 }
 
 export function ModalEdit({ toggle, open, product }: ModalEditProps) {
+  const toast = useCustomToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const {
     register,
@@ -50,13 +52,25 @@ export function ModalEdit({ toggle, open, product }: ModalEditProps) {
       if (selectedFile) {
         data.append("file", selectedFile, selectedFile.name);
         await updateProduct({ ...newProduct, avatar: data });
+        toast({
+          data: {
+            color: "success",
+            message: "<strong>Produto</strong> criado com sucesso",
+          },
+        });
         toggle();
       } else {
         await updateProduct({ ...newProduct, avatar: product.avatar });
         toggle();
       }
     } catch {
-      console.log("Erro na API");
+      toast({
+        data: {
+          color: "error",
+          message: "Servidor fora do ar",
+        },
+      });
+      throw new Error("Servidor fora do ar");
     }
   }
 

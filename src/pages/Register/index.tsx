@@ -24,6 +24,7 @@ import { optionGender } from "@/utils/mocks/gender";
 import { createUser } from "@/services/_v1/user-service";
 import { useNavigate } from "react-router-dom";
 import { PublicLayout } from "@/layouts/PublicLayout";
+import useCustomToast from "@/hooks/useCustomToast";
 
 export const newUserFormValidationSchema = zod.object({
   nome: zod.string().min(1, "Campo obrigatório"),
@@ -44,6 +45,7 @@ export const newUserFormValidationSchema = zod.object({
 export type NewUserFormData = zod.infer<typeof newUserFormValidationSchema>;
 
 export default function Register() {
+  const toast = useCustomToast();
   const [existsCep, setExistsCep] = useState(false);
   const {
     register,
@@ -73,12 +75,24 @@ export default function Register() {
       if (isValidCPF) {
         await createUser({ ...user, cpf: unMask(user.cpf) });
         navigate("/");
+        toast({
+          data: {
+            color: "success",
+            message: "<strong>Produto</strong> criado com sucesso",
+          },
+        });
         reset();
       } else {
         setError("cpf", { message: "CPF Inválido", type: "validate" });
       }
     } catch {
-      console.log("Erro na API");
+      toast({
+        data: {
+          color: "error",
+          message: "Servidor fora do ar",
+        },
+      });
+      throw new Error("Servidor fora do ar");
     }
   }
 

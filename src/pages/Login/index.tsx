@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ContainerLogin, FormContainer, LinkRegister } from "./styles";
 import { AuthContext } from "@/contexts/authContext";
 import { PublicLayout } from "@/layouts/PublicLayout";
+import useCustomToast from "@/hooks/useCustomToast";
 
 export const loginFormValidationSchema = zod.object({
   email: zod.string().min(1, "Campo obrigatório").email(),
@@ -17,6 +18,7 @@ export type LoginFormData = zod.infer<typeof loginFormValidationSchema>;
 
 export default function Login() {
   const { signIn } = useContext(AuthContext);
+  const toast = useCustomToast();
   const [errorMessage, setErrorMessage] = useState("");
   const {
     register,
@@ -32,8 +34,14 @@ export default function Login() {
     try {
       await signIn(data);
     } catch (err) {
-      console.warn((err as Error).message);
+      toast({
+        data: {
+          color: "error",
+          message: `${(err as Error).message}`,
+        },
+      });
       setErrorMessage((err as Error).message);
+      throw new Error("Servidor fora do ar");
     }
   }
 

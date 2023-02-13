@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import * as zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, useState } from "react";
+import useCustomToast from "@/hooks/useCustomToast";
 
 export const newProductFormValidationSchema = zod.object({
   nome: zod.string().min(3, "Campo obrigatório"),
@@ -22,6 +23,7 @@ interface ModalAddProps {
 }
 
 export function ModalAdd({ toggle, open }: ModalAddProps) {
+  const toast = useCustomToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [messageErrorFile, setMessageErrorFile] = useState("");
   const {
@@ -48,12 +50,24 @@ export function ModalAdd({ toggle, open }: ModalAddProps) {
       if (selectedFile) {
         data.append("file", selectedFile, selectedFile.name);
         await createProduct({ ...newProduct, avatar: data });
+        toast({
+          data: {
+            color: "success",
+            message: "<strong>Produto</strong> criado com sucesso",
+          },
+        });
         toggle();
       } else {
         setMessageErrorFile("Selecione um arquivo de imagem");
       }
     } catch {
-      console.log("Erro na API");
+      toast({
+        data: {
+          color: "error",
+          message: "Servidor fora do ar",
+        },
+      });
+      throw new Error("Servidor fora do ar");
     }
   }
 
