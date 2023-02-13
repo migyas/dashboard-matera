@@ -1,38 +1,49 @@
-import { AuthContext } from "@/contexts/authContext";
-import { DashboardOutlined, LogoutOutlined, StoreOutlined } from "@mui/icons-material";
-import { Button } from "@mui/material";
-import { useContext } from "react";
-import { SidebarContainer, SidebarContent, SidebarNavItem, SidebarOverlay } from "./styles";
+import { DashboardOutlined, MenuOutlined, StoreOutlined } from "@mui/icons-material";
+import { SpeedDial } from "@mui/material";
+import { useState } from "react";
+import {
+  SidebarContainer,
+  SidebarContent,
+  SidebarNavItem,
+  SidebarOverlay,
+  SpeedDialCustom,
+} from "./styles";
 
 export function Sidebar() {
-  const { signOut } = useContext(AuthContext);
+  const [open, setOpen] = useState(false);
 
-  function handleLogout() {
-    signOut();
-  }
+  const handleOpen = () => setOpen(!open);
+
+  console.log(open);
 
   return (
-    <SidebarContainer>
-      <SidebarOverlay />
-      <SidebarContent>
-        <header>
-          <strong>Matera - Onidata</strong>
-        </header>
-        <nav>
-          <SidebarNavItem to="/">
-            <DashboardOutlined />
-            <strong>Dashboard</strong>
-          </SidebarNavItem>
-          <SidebarNavItem to="/products">
-            <StoreOutlined />
-            <strong>Produtos</strong>
-          </SidebarNavItem>
-        </nav>
-        <Button onClick={handleLogout} style={{ marginBottom: "1rem" }}>
-          <LogoutOutlined />
-          <strong>Sair</strong>
-        </Button>
-      </SidebarContent>
-    </SidebarContainer>
+    <>
+      <SidebarContainer open={open}>
+        <SidebarOverlay onClick={handleOpen} />
+        <SidebarContent>
+          <header>
+            <strong>Matera - Onidata</strong>
+          </header>
+          <nav>
+            <SidebarNavItem to="/">
+              <DashboardOutlined />
+              <strong>Dashboard</strong>
+            </SidebarNavItem>
+            <SidebarNavItem to="/products">
+              <StoreOutlined />
+              <strong>Produtos</strong>
+            </SidebarNavItem>
+          </nav>
+        </SidebarContent>
+      </SidebarContainer>
+      <SpeedDialCustom
+        ariaLabel="SpeedDial basic example"
+        sx={{ position: "absolute", bottom: 16, right: 16 }}
+        icon={<MenuOutlined />}
+        onOpen={handleOpen}
+        onClose={handleOpen}
+        open={open}
+      />
+    </>
   );
 }

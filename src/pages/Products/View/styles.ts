@@ -6,6 +6,7 @@ export const Container = styled.div`
   header {
     display: flex;
     justify-content: space-between;
+    margin: 3rem 0 1rem;
   }
 `;
 
@@ -21,7 +22,6 @@ export const DescriptionProduct = styled.div`
   img {
     width: 5rem;
     height: 5rem;
-    margin-top: 3.5rem;
     margin-bottom: 2.5rem;
   }
 

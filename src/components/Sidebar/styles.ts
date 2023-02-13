@@ -1,5 +1,6 @@
+import { SpeedDial } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 export const SidebarNavItem = styled(NavLink)`
   display: flex;
@@ -18,24 +19,46 @@ export const SidebarNavItem = styled(NavLink)`
   }
 `;
 
-export const SidebarContainer = styled.div`
+interface SidebarContainerProps {
+  open: boolean;
+}
+
+export const SidebarContainer = styled.div<SidebarContainerProps>`
   background: ${(props) => props.theme["gray-800"]};
+  z-index: 9;
+
+  @media (max-width: 540px) {
+    ${(props) =>
+      props.open &&
+      css`
+        display: none;
+
+        position: fixed;
+        background: ${(props) => props.theme["gray-800"]};
+      `}
+  }
+`;
+
+export const SpeedDialCustom = styled(SpeedDial)`
+  visibility: hidden;
+
+  @media (max-width: 540px) {
+    visibility: visible;
+  }
 `;
 
 export const SidebarOverlay = styled.div`
+  background: ${(props) => props.theme["gray-700"]};
   @media (max-width: 540px) {
-    &.--expand {
-      position: absolute;
-      content: " ";
-      background: ${(props) => props.theme["gray-700"]};
-      transition: all 0.8s;
-      opacity: 0.4;
-      min-width: 100vw;
-      height: 100%;
-      top: 0;
-      right: 0;
-      z-index: 1000;
-    }
+    position: absolute;
+    content: " ";
+    background: ${(props) => props.theme["gray-700"]};
+    transition: all 0.8s;
+    opacity: 0.4;
+    min-width: 100vw;
+    height: 100%;
+    top: 0;
+    right: 0;
   }
 `;
 
@@ -85,6 +108,7 @@ export const SidebarContent = styled.div`
 
   @media (max-width: 540px) {
     position: fixed;
+    background: ${(props) => props.theme["gray-800"]};
 
     &.sidebar__overlay {
       content: "";

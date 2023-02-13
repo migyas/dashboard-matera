@@ -6,7 +6,7 @@ export const Container = styled.div`
   header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 3rem;
+    margin: 3rem 0;
   }
 
   form {
