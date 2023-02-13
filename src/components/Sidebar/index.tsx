@@ -1,5 +1,4 @@
 import { DashboardOutlined, MenuOutlined, StoreOutlined } from "@mui/icons-material";
-import { SpeedDial } from "@mui/material";
 import { useState } from "react";
 import {
   SidebarContainer,
