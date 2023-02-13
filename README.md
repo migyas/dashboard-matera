@@ -2,7 +2,7 @@
 
 ### Demo
 
-`https://dashboard-whitelabel.netlify.app/`
+`https://dashboard-matera.netlify.app/`
 
 ### Getting started
 
