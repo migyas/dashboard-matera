@@ -1,6 +1,7 @@
 import { Routes as Switch, Route, Navigate } from "react-router-dom";
 import { PrivateLayout } from "@/layouts/PrivateLayout";
 import { lazy, Suspense } from "react";
+import NotFoundPage from "@/pages/NotFound";
 
 const routesPublic = [
   {
@@ -32,12 +33,18 @@ const routesPrivate = [
 ];
 
 export function Routes() {
-  const isAuthenticated = true;
+  const isAuthenticated = localStorage.getItem("@matera-dashboard:user-token");
 
   return (
     <Switch>
-      {/* TODO - Colocar uma tela de 404 Page not found */}
-      {/* <Route path="*" element={<Navigate to="/login" />} /> */}
+      <Route
+        path="*"
+        element={
+          <Suspense fallback={"Carregando..."}>
+            <NotFoundPage />
+          </Suspense>
+        }
+      />
       {isAuthenticated ? (
         <Route path="/" element={<PrivateLayout />}>
           {routesPrivate.map((route, index) => {

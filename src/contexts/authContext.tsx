@@ -1,6 +1,10 @@
 import { searchForUsers } from "@/services/_v1/user-service";
-import { removeTokenInLocalStorage, setTokenInLocalStorage } from "@/utils/authUtils";
-import { createContext, PropsWithChildren, useState } from "react";
+import {
+  removeTokenInLocalStorage,
+  setTokenInLocalStorage,
+  setUserInLocalStorage,
+} from "@/utils/authUtils";
+import { createContext, PropsWithChildren, useEffect, useState } from "react";
 import { redirect } from "react-router-dom";
 
 interface LoginFormData {
@@ -8,31 +12,21 @@ interface LoginFormData {
   senha: string;
 }
 
-interface UserData {
-  token: string;
-  nome: string;
-  sobrenome: string;
-  image: string;
-}
-
 interface AuthContextProps {
   signIn: (data: LoginFormData) => Promise<void>;
-  signOut: () => Promise<void>;
-  user: UserData;
+  signOut: () => void;
 }
 
 export const AuthContext = createContext({} as AuthContextProps);
 
 export function AuthProvider({ children }: PropsWithChildren) {
-  const [user, setUser] = useState({} as UserData);
-
   async function signIn(data: LoginFormData) {
     const response = await searchForUsers(data);
 
     if (response.length > 0) {
-      const user = response[0];
-      setUser(user);
-      setTokenInLocalStorage(user.token);
+      const userLogged = response[0];
+      setTokenInLocalStorage(userLogged.token);
+      setUserInLocalStorage(userLogged);
       redirect("/dashboard");
       window.location.reload();
     } else {
@@ -40,11 +34,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }
 
-  async function signOut() {
+  function signOut() {
     removeTokenInLocalStorage();
     redirect("/login");
     window.location.reload();
   }
 
-  return <AuthContext.Provider value={{ signIn, signOut, user }}>{children}</AuthContext.Provider>;
+  useEffect(() => {
+    (async () => {})();
+  }, []);
+
+  return <AuthContext.Provider value={{ signIn, signOut }}>{children}</AuthContext.Provider>;
 }

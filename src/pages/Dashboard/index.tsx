@@ -1,9 +1,8 @@
-import { AuthContext } from "@/contexts/authContext";
-import { useContext } from "react";
+import { getUserParsedInLocalStorage } from "@/utils/authUtils";
 import { Container, WelcomeCard } from "./styles";
 
 export default function Dashboard() {
-  const { user } = useContext(AuthContext);
+  const user = getUserParsedInLocalStorage();
   return (
     <Container>
       <h1>Dashboard</h1>

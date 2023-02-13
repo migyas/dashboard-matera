@@ -6,6 +6,7 @@ import * as zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, useState } from "react";
 import useCustomToast from "@/hooks/useCustomToast";
+import { ModalContent } from "../styles";
 
 export const newProductFormValidationSchema = zod.object({
   nome: zod.string().min(3, "Campo obrigatório"),
@@ -85,94 +86,85 @@ export function ModalAdd({ toggle, open }: ModalAddProps) {
       closeAfterTransition
     >
       <Fade in={open}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          style={{
-            background: "#ffffff",
-            height: "100%",
-            width: "30%",
-            padding: "2rem",
-            display: "flex",
-            gap: "1.5rem",
-            flexDirection: "column",
-          }}
-        >
-          <header>
-            <strong style={{ color: "#222" }}>Cadastrar novo produto</strong>
-          </header>
-          <TextField
-            {...register("nome")}
-            label="Nome"
-            fullWidth
-            error={!!errors.nome}
-            helperText={!!errors.nome && errors.nome?.message}
-          />
-          <TextField
-            {...register("marca")}
-            label="Marca"
-            fullWidth
-            error={!!errors.marca}
-            helperText={!!errors.marca && errors.marca?.message}
-          />
+        <ModalContent>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <header>
+              <strong style={{ color: "#222" }}>Cadastrar novo produto</strong>
+            </header>
+            <TextField
+              {...register("nome")}
+              label="Nome"
+              fullWidth
+              error={!!errors.nome}
+              helperText={!!errors.nome && errors.nome?.message}
+            />
+            <TextField
+              {...register("marca")}
+              label="Marca"
+              fullWidth
+              error={!!errors.marca}
+              helperText={!!errors.marca && errors.marca?.message}
+            />
 
-          <TextField
-            {...register("preco", {
-              onChange: (e) => setValue("preco", maskCurrency(e.target.value)),
-            })}
-            fullWidth
-            placeholder="R$ 00,00"
-            error={!!errors.preco}
-            helperText={!!errors.preco && errors.preco?.message}
-          />
+            <TextField
+              {...register("preco", {
+                onChange: (e) => setValue("preco", maskCurrency(e.target.value)),
+              })}
+              fullWidth
+              placeholder="R$ 00,00"
+              error={!!errors.preco}
+              helperText={!!errors.preco && errors.preco?.message}
+            />
 
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                {...register("qt_estoque", {
-                  valueAsNumber: true,
-                })}
-                fullWidth
-                type="number"
-                label="Qtd Estoque"
-                error={!!errors.qt_estoque}
-                helperText={!!errors.qt_estoque && errors.qt_estoque?.message}
-              />
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  {...register("qt_estoque", {
+                    valueAsNumber: true,
+                  })}
+                  fullWidth
+                  type="number"
+                  label="Qtd Estoque"
+                  error={!!errors.qt_estoque}
+                  helperText={!!errors.qt_estoque && errors.qt_estoque?.message}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  {...register("qt_vendas", {
+                    valueAsNumber: true,
+                  })}
+                  fullWidth
+                  type="number"
+                  label="Qtd Vendas"
+                  error={!!errors.qt_vendas}
+                  helperText={!!errors.qt_vendas && errors.qt_vendas?.message}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <TextField
-                {...register("qt_vendas", {
-                  valueAsNumber: true,
-                })}
-                fullWidth
-                type="number"
-                label="Qtd Vendas"
-                error={!!errors.qt_vendas}
-                helperText={!!errors.qt_vendas && errors.qt_vendas?.message}
-              />
+            <Button variant="contained" component="label">
+              Enviar Avatar
+              <input type="file" hidden accept="image/*" onChange={handleSelectedFile} />
+            </Button>
+            {selectedFile ? (
+              <strong style={{ color: "#222" }}>{selectedFile.name}</strong>
+            ) : (
+              <FormHelperText error>{messageErrorFile}</FormHelperText>
+            )}
+            <Grid container spacing={3} mt={4}>
+              <Grid item>
+                <Button color="error" variant="outlined" onClick={handleClose}>
+                  Cancelar
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button color="success" variant="contained" type="submit" disabled={isSubmitting}>
+                  Adicionar
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-          <Button variant="contained" component="label">
-            Enviar Avatar
-            <input type="file" hidden accept="image/*" onChange={handleSelectedFile} />
-          </Button>
-          {selectedFile ? (
-            <strong style={{ color: "#222" }}>{selectedFile.name}</strong>
-          ) : (
-            <FormHelperText error>{messageErrorFile}</FormHelperText>
-          )}
-          <Grid container spacing={3} mt={4}>
-            <Grid item>
-              <Button color="error" variant="outlined" onClick={handleClose}>
-                Cancelar
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button color="success" variant="contained" type="submit" disabled={isSubmitting}>
-                Adicionar
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
+          </form>
+        </ModalContent>
       </Fade>
     </Modal>
   );
