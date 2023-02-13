@@ -6,11 +6,11 @@ import defaultImageProduct from "@/assets/caixa.png";
 import { Container, ContainerAvatar, ProductList } from "./styles";
 import { dateFormatter, priceFormatter } from "@/utils/formatter";
 import { useForm } from "react-hook-form";
-import { maskCurrency } from "@/utils/mask";
 import { ModalAdd } from "./ModalAdd";
 import useDisclosure from "@/hooks/useDisclosure";
+import { useNavigate } from "react-router-dom";
 
-interface ProductData {
+export interface ProductData {
   id: string;
   nome: string;
   marca: string;
@@ -29,6 +29,7 @@ export default function Products() {
   const [products, setProducts] = useState<ProductData[]>([]);
   const [page, setPage] = useState(1);
   const [countPage, setCountPage] = useState(0);
+  const navigate = useNavigate();
   const { toggle: toggleModalAdd, isOpen: isOpenModalAdd } = useDisclosure();
   const { register, handleSubmit, reset, setValue } = useForm<SearchQueryFormProps>();
 
@@ -121,8 +122,7 @@ export default function Products() {
                     <button
                       title="Visualizar"
                       onClick={() => {
-                        // toggleModalEdit();
-                        // setUser(user);
+                        navigate(`/products/${product.id}`);
                       }}
                     >
                       <SearchOutlined />

@@ -16,9 +16,14 @@ async function getAllProducts(params?: PaginationQueryParamsProps) {
   return data;
 }
 
+async function getProductById(id: string) {
+  const { data } = await api.get(`/produto/${id}`);
+  return data;
+}
+
 async function createProduct(product: CreateProductData) {
   const { data } = await api.post("/produto", product);
   return data;
 }
 
-export { getAllProducts, createProduct };
+export { getAllProducts, createProduct, getProductById };
