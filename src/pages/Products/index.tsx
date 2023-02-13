@@ -6,6 +6,9 @@ import defaultImageProduct from "@/assets/caixa.png";
 import { Container, ContainerAvatar, ProductList } from "./styles";
 import { dateFormatter, priceFormatter } from "@/utils/formatter";
 import { useForm } from "react-hook-form";
+import { maskCurrency } from "@/utils/mask";
+import { ModalAdd } from "./ModalAdd";
+import useDisclosure from "@/hooks/useDisclosure";
 
 interface ProductData {
   id: string;
@@ -19,14 +22,15 @@ interface ProductData {
 
 interface SearchQueryFormProps {
   query: string;
+  price?: string;
 }
 
 export default function Products() {
   const [products, setProducts] = useState<ProductData[]>([]);
   const [page, setPage] = useState(1);
   const [countPage, setCountPage] = useState(0);
-  const [textWithoutProduct, setTextWithoutProduct] = useState();
-  const { register, handleSubmit, reset } = useForm<SearchQueryFormProps>();
+  const { toggle: toggleModalAdd, isOpen: isOpenModalAdd } = useDisclosure();
+  const { register, handleSubmit, reset, setValue } = useForm<SearchQueryFormProps>();
 
   async function onSubmit({ query }: SearchQueryFormProps) {
     try {
@@ -63,7 +67,7 @@ export default function Products() {
       <header>
         <h1>Produtos</h1>
         <div>
-          <Button variant="contained" color="success">
+          <Button variant="contained" color="success" onClick={toggleModalAdd}>
             Adicionar produto
           </Button>
         </div>
@@ -135,6 +139,7 @@ export default function Products() {
         </table>
       </ProductList>
       <Pagination count={countPage} page={page} onChange={handleChange} />
+      <ModalAdd open={isOpenModalAdd} toggle={toggleModalAdd} />
     </Container>
   );
 }

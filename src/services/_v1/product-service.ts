@@ -1,3 +1,4 @@
+import { NewProductFormData } from "@/pages/Products/ModalAdd";
 import { api } from "../api";
 
 interface PaginationQueryParamsProps {
@@ -6,9 +7,18 @@ interface PaginationQueryParamsProps {
   search?: string;
 }
 
+interface CreateProductData extends NewProductFormData {
+  avatar: FormData;
+}
+
 async function getAllProducts(params?: PaginationQueryParamsProps) {
   const { data } = await api.get("/produto", { params });
   return data;
 }
 
-export { getAllProducts };
+async function createProduct(product: CreateProductData) {
+  const { data } = await api.post("/produto", product);
+  return data;
+}
+
+export { getAllProducts, createProduct };

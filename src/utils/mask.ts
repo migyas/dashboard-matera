@@ -1,4 +1,4 @@
-import { toPattern } from "vanilla-masker";
+import VMasker, { toPattern, toMoney } from "vanilla-masker";
 
 interface PatternOptions {
   pattern?: string | undefined;
@@ -32,3 +32,10 @@ export const mask = (
   typeof pattern === "string"
     ? masker(value, pattern || "", options)
     : multimasker(value, pattern, options);
+
+export const maskCurrency = (value: string) => {
+  return VMasker.toMoney(value, {
+    precision: 2,
+    unit: "R$",
+  });
+};

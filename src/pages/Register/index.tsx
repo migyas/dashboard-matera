@@ -127,9 +127,7 @@ export default function Register() {
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <TextField
-                {...register("nome", {
-                  required: "Campo Obrigatório",
-                })}
+                {...register("nome")}
                 label="Nome"
                 variant="outlined"
                 error={!!errors.nome}

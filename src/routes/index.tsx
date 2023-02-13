@@ -1,5 +1,4 @@
 import { Routes as Switch, Route, Navigate } from "react-router-dom";
-import { PublicLayout } from "@/layouts/PublicLayout";
 import { PrivateLayout } from "@/layouts/PrivateLayout";
 import { lazy, Suspense } from "react";
 
@@ -23,6 +22,11 @@ const routesPrivate = [
   {
     path: "/products",
     element: lazy(() => import("@/pages/Products")),
+    isIndex: false,
+  },
+  {
+    path: "/products/:id",
+    element: lazy(() => import("@/pages/Products/View")),
     isIndex: false,
   },
 ];
